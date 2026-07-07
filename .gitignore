@@ -1,0 +1,10 @@
+# Repositórios clonados (não vamos poluir o nosso repo principal)
+/moodle/
+/moodle-docker/
+
+# Scripts gerados dinamicamente
+/start-moodle.sh
+
+# Arquivos temporários e logs
+*.log
+.DS_Store

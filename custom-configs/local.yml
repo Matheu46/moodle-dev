@@ -1,0 +1,7 @@
+version: "2"
+services:
+  webserver:
+    volumes:
+      - "/home/matheus/meus-plugins:/home/matheus/meus-plugins:cached"
+      - "/home/matheus/moodle-dev/dummy-config.php:/home/matheus/config.php:cached"
+      - "/home/matheus/moodle-dev/moodle-docker/moodle-plugins.conf:/etc/apache2/conf-enabled/moodle-plugins.conf:cached"
