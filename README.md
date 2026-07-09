@@ -6,6 +6,7 @@ Um ambiente de desenvolvimento Moodle para a criação de plugins. Este projeto 
 
 *   **`setup_moodle_env.sh`**: O script principal de instalação. Ele clona os repositórios oficiais do Moodle e do moodle-docker, aplica as configurações customizadas e prepara o banco de dados.
 *   **`start-moodle.sh`**: Script para iniciar os contêineres Docker do ambiente Moodle de forma segura.
+*   **`stop-moodle.sh`**: Script para parar os contêineres Docker (pausar o ambiente) sem destruir os dados.
 *   **`switch-moodle-version.sh`**: Script para trocar a versão do Moodle (ex: de `4.5` para `5.2`). Ele lida com a troca de branches no repositório, limpeza de cache e recriação do banco de dados quando necessário.
 *   **`link-plugins.sh`**: Responsável por fazer o mapeamento dos seus plugins externos (localizados em `~/meus-plugins`) para dentro da estrutura do Moodle via symlinks.
 *   **`custom-configs/local.yml`**: Configuração customizada injetada no `moodle-docker` para garantir que as pastas dos plugins externos sejam mapeadas no contêiner do servidor web.
