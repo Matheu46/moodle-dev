@@ -14,18 +14,42 @@ if [ ! -d "$MOODLE_DIR/node_modules" ] || [ -z "$(ls -A "$MOODLE_DIR/node_module
     docker run --rm -v "$MOODLE_DIR:/moodle" -w /moodle $IMAGE_NAME npm install
 fi
 
-# Build dynamic volumes for all external plugins
+# Build dynamic volumes for all external plugins and prepare to hide symlinks
 VOLUMES="-v $MOODLE_DIR:/moodle"
+SYMLINKS_TO_RESTORE=()
+
 for plugin in $HOME/meus-plugins/*; do
     if [ -d "$plugin" ]; then
         plugin_name=$(basename "$plugin")
         plugin_type="${plugin_name%%_*}"
         plugin_subname="${plugin_name#*_}"
         if [ -n "$plugin_type" ] && [ -n "$plugin_subname" ] && [ "$plugin_type" != "$plugin_name" ]; then
+            moodle_target="$MOODLE_DIR/$plugin_type/$plugin_subname"
+            
+            # If it's a symlink, remove it temporarily so Docker mounts a real directory
+            if [ -L "$moodle_target" ]; then
+                rm "$moodle_target"
+                SYMLINKS_TO_RESTORE+=("$plugin|$moodle_target")
+            fi
+            
             VOLUMES="$VOLUMES -v $plugin:/moodle/$plugin_type/$plugin_subname"
         fi
     fi
 done
+
+# Trap to ensure symlinks are restored even if the user presses Ctrl+C
+restore_symlinks() {
+    for entry in "${SYMLINKS_TO_RESTORE[@]}"; do
+        source="${entry%%|*}"
+        target="${entry##*|}"
+        # If Docker created it as root, remove it using Docker
+        if [ -d "$target" ]; then
+            docker run --rm -v "$MOODLE_DIR:/moodle" alpine rm -rf "/moodle/${target#$MOODLE_DIR/}" 2>/dev/null || rm -rf "$target" 2>/dev/null
+        fi
+        ln -s "$source" "$target"
+    done
+}
+trap restore_symlinks EXIT
 
 # Pass any arguments provided to grunt (e.g., amd, watch)
 if [ $# -eq 0 ]; then
