@@ -18,8 +18,25 @@ export MOODLE_DOCKER_WWWROOT="$HOME/moodle-dev/moodle"
 export MOODLE_DOCKER_DB=pgsql
 DOCKER_DIR="$HOME/moodle-dev/moodle-docker"
 
+# Define a versão do PHP com base na branch
+case "$BRANCH" in
+    MOODLE_400_STABLE|MOODLE_401_STABLE|MOODLE_402_STABLE)
+        PHP_VERSION="8.0"
+        ;;
+    MOODLE_403_STABLE|MOODLE_404_STABLE)
+        PHP_VERSION="8.1"
+        ;;
+    *)
+        PHP_VERSION="8.3"
+        ;;
+esac
+
+echo "export MOODLE_DOCKER_PHP_VERSION=\"$PHP_VERSION\"" > "$HOME/moodle-dev/.moodle-env"
+source "$HOME/moodle-dev/.moodle-env"
+
 echo "=========================================="
 echo "Mudando Moodle para a branch: $BRANCH"
+echo "Versão do PHP configurada para: $PHP_VERSION"
 echo "=========================================="
 
 # 1. Mudar a branch no repositório Moodle
@@ -35,13 +52,14 @@ echo "--> Refazendo links dos plugins conforme a estrutura da branch..."
 
 cd "$DOCKER_DIR"
 
-# Reinicia o servidor web para garantir que o Apache aponte para a raiz correta (public ou /)
-echo "--> Reiniciando webserver para atualizar rotas do Apache..."
-bin/moodle-docker-compose restart webserver
+# Recria o servidor web com a imagem do PHP correta e garante rotas do Apache
+echo "--> Recriando webserver (PHP $PHP_VERSION)..."
+bin/moodle-docker-compose up -d webserver
 
 # 2. Instalar as dependências do Composer (Essencial no Moodle 5.x)
 echo "--> Resolvendo dependências do Composer..."
 bin/moodle-docker-compose exec -T webserver bash -c '
+    git config --global --add safe.directory /var/www/html
     cd /var/www/html
     if [ ! -f composer.phar ]; then
         curl -sS https://getcomposer.org/installer | php

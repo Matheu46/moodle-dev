@@ -2,8 +2,9 @@
 /moodle/
 /moodle-docker/
 
-# Scripts gerados dinamicamente
+# Scripts gerados dinamicamente e arquivos de ambiente local
 /start-moodle.sh
+/.moodle-env
 
 # Arquivos temporários e logs
 *.log
