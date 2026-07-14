@@ -14,6 +14,15 @@ if [ ! -d "$MOODLE_DIR/node_modules" ] || [ -z "$(ls -A "$MOODLE_DIR/node_module
     docker run --rm -v "$MOODLE_DIR:/moodle" -w /moodle $IMAGE_NAME npm install
 fi
 
+cd "$MOODLE_DIR"
+if git ls-tree HEAD public 2>/dev/null | grep -q tree; then
+    WEBROOT_REL="public"
+    WEBROOT="$MOODLE_DIR/public"
+else
+    WEBROOT_REL=""
+    WEBROOT="$MOODLE_DIR"
+fi
+
 # Build dynamic volumes for all external plugins and prepare to hide symlinks
 VOLUMES="-v $MOODLE_DIR:/moodle"
 SYMLINKS_TO_RESTORE=()
@@ -23,8 +32,28 @@ for plugin in $HOME/meus-plugins/*; do
         plugin_name=$(basename "$plugin")
         plugin_type="${plugin_name%%_*}"
         plugin_subname="${plugin_name#*_}"
-        if [ -n "$plugin_type" ] && [ -n "$plugin_subname" ] && [ "$plugin_type" != "$plugin_name" ]; then
-            moodle_target="$MOODLE_DIR/$plugin_type/$plugin_subname"
+        
+        if [ "$plugin_type" != "$plugin_name" ]; then
+            case "$plugin_type" in
+                "local")   target_dir="local" ;;
+                "mod")     target_dir="mod" ;;
+                "block")   target_dir="blocks" ;;
+                "theme")   target_dir="theme" ;;
+                "format")  target_dir="course/format" ;;
+                "enrol")   target_dir="enrol" ;;
+                "auth")    target_dir="auth" ;;
+                "tool")    target_dir="admin/tool" ;;
+                "report")  target_dir="report" ;;
+                "qtype")   target_dir="question/type" ;;
+                *)         continue ;;
+            esac
+            
+            moodle_target="$WEBROOT/$target_dir/$plugin_subname"
+            if [ -n "$WEBROOT_REL" ]; then
+                docker_target="/moodle/$WEBROOT_REL/$target_dir/$plugin_subname"
+            else
+                docker_target="/moodle/$target_dir/$plugin_subname"
+            fi
             
             # If it's a symlink, remove it temporarily so Docker mounts a real directory
             if [ -L "$moodle_target" ]; then
@@ -32,7 +61,7 @@ for plugin in $HOME/meus-plugins/*; do
                 SYMLINKS_TO_RESTORE+=("$plugin|$moodle_target")
             fi
             
-            VOLUMES="$VOLUMES -v $plugin:/moodle/$plugin_type/$plugin_subname"
+            VOLUMES="$VOLUMES -v $plugin:$docker_target"
         fi
     fi
 done
@@ -52,14 +81,28 @@ restore_symlinks() {
 trap restore_symlinks EXIT
 
 # Pass any arguments provided to grunt (e.g., amd, watch)
+# Pass any arguments provided to grunt (e.g., amd, watch)
 if [ $# -eq 0 ]; then
     echo "Executando: npx grunt amd (padrão)"
     docker run --rm $VOLUMES -w /moodle $IMAGE_NAME npx grunt amd
 else
-    echo "Executando: npx grunt $@"
+    # Intercepta os argumentos para corrigir o caminho --root se necessário (Moodle 5.x)
+    ARGS=()
+    for arg in "$@"; do
+        if [[ "$arg" == --root=* ]]; then
+            ROOT_VAL="${arg#*=}"
+            if [ -n "$WEBROOT_REL" ] && [[ "$ROOT_VAL" != "$WEBROOT_REL/"* ]]; then
+                arg="--root=$WEBROOT_REL/$ROOT_VAL"
+                echo "-> Corrigindo caminho --root para: $arg (Moodle usa diretório $WEBROOT_REL)"
+            fi
+        fi
+        ARGS+=("$arg")
+    done
+
+    echo "Executando: npx grunt ${ARGS[@]}"
     if [ "$1" = "watch" ]; then
-        docker run -it --rm $VOLUMES -w /moodle $IMAGE_NAME npx grunt "$@"
+        docker run -it --rm $VOLUMES -w /moodle $IMAGE_NAME npx grunt "${ARGS[@]}"
     else
-        docker run --rm $VOLUMES -w /moodle $IMAGE_NAME npx grunt "$@"
+        docker run --rm $VOLUMES -w /moodle $IMAGE_NAME npx grunt "${ARGS[@]}"
     fi
 fi
