@@ -50,6 +50,16 @@ for PLUGIN_PATH in "$PLUGINS_BASE_DIR"/*; do
     
     SYMLINK_TARGET="$WEBROOT/$TARGET_DIR/$PLUGIN_NAME"
     
+    # Verifica se o plugin possui um arquivo indicando desativação (.disabled ou .ignore)
+    if [ -f "$PLUGIN_PATH/.disabled" ] || [ -f "$PLUGIN_PATH/.ignore" ]; then
+        echo "Plugin $PLUGIN_DIRNAME está desativado (.disabled/.ignore encontrado)."
+        if [ -L "$SYMLINK_TARGET" ]; then
+            echo "  -> Removendo symlink de $SYMLINK_TARGET"
+            rm "$SYMLINK_TARGET"
+        fi
+        continue
+    fi
+    
     echo "Configurando plugin $PLUGIN_DIRNAME -> $SYMLINK_TARGET"
     
     mkdir -p "$WEBROOT/$TARGET_DIR"

@@ -44,6 +44,7 @@ Para facilitar a aderência aos padrões de código do Moodle, este ambiente inc
    ```bash
    ./switch-moodle-version.sh MOODLE_502_STABLE
    ```
+   Se vai diminuir a versão então --reset-db
 
 ## ⚠️ Requisitos
 
