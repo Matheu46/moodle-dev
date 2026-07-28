@@ -8,7 +8,7 @@ Um ambiente de desenvolvimento Moodle para a criação de plugins. Este projeto 
 *   **`start-moodle.sh`**: Script para iniciar os contêineres Docker do ambiente Moodle de forma segura.
 *   **`stop-moodle.sh`**: Script para parar os contêineres Docker (pausar o ambiente) sem destruir os dados.
 *   **`switch-moodle-version.sh`**: Script para trocar a versão do Moodle (ex: de `4.5` para `5.2`). Ele lida com a troca de branches no repositório, limpeza de cache e recriação do banco de dados quando necessário.
-*   **`link-plugins.sh`**: Responsável por fazer o mapeamento dos seus plugins externos (localizados em `~/meus-plugins`) para dentro da estrutura do Moodle via symlinks.
+*   **`link-plugins.sh`**: Responsável por fazer o mapeamento dos seus plugins externos (localizados em `~/moodle-dev/meus-plugins`) para dentro da estrutura do Moodle via symlinks.
 *   **`custom-configs/local.yml`**: Configuração customizada injetada no `moodle-docker` para garantir que as pastas dos plugins externos sejam mapeadas no contêiner do servidor web.
 *   **`dummy-config.php`**: Arquivo auxiliar que resolve problemas de escopo de caminhos (`require_once`) quando plugins acessam o `config.php` a partir de symlinks externos.
 
@@ -30,7 +30,7 @@ Para facilitar a aderência aos padrões de código do Moodle, este ambiente inc
    ./start-moodle.sh
    ```
 2. **Desenvolva seus plugins:**
-   Crie ou edite seus plugins na pasta externa `~/meus-plugins`. O ambiente já está configurado para refletir as alterações no Moodle em tempo real.
+   Crie ou edite seus plugins na pasta `~/moodle-dev/meus-plugins`. O ambiente já está configurado para refletir as alterações no Moodle em tempo real.
 3. **Compile o Javascript (se houver):**
    ```bash
    ./run-grunt.sh amd --root=local/seu-plugin

@@ -27,7 +27,7 @@ fi
 VOLUMES="-v $MOODLE_DIR:/moodle"
 SYMLINKS_TO_RESTORE=()
 
-for plugin in $HOME/meus-plugins/*; do
+for plugin in $HOME/moodle-dev/meus-plugins/*; do
     if [ -d "$plugin" ]; then
         plugin_name=$(basename "$plugin")
         plugin_type="${plugin_name%%_*}"

@@ -2,7 +2,7 @@
 set -e
 
 BASE_DIR="$HOME/moodle-dev"
-PLUGINS_BASE_DIR="$HOME/meus-plugins"
+PLUGINS_BASE_DIR="$BASE_DIR/meus-plugins"
 MOODLE_DIR="$BASE_DIR/moodle"
 
 cd "$MOODLE_DIR"
@@ -44,8 +44,9 @@ for PLUGIN_PATH in "$PLUGINS_BASE_DIR"/*; do
         "auth")    TARGET_DIR="auth" ;;
         "tool")    TARGET_DIR="admin/tool" ;;
         "report")  TARGET_DIR="report" ;;
-        "qtype")   TARGET_DIR="question/type" ;;
-        *)         continue ;;
+        "qtype")       TARGET_DIR="question/type" ;;
+        "contenttype") TARGET_DIR="contentbank/contenttype" ;;
+        *)             continue ;;
     esac
     
     SYMLINK_TARGET="$WEBROOT/$TARGET_DIR/$PLUGIN_NAME"

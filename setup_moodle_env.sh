@@ -31,7 +31,7 @@ if [ -d "$BASE_DIR/custom-configs" ]; then
 fi
 
 # 4. Process all plugins inside the freelance plugins directory dynamically
-PLUGINS_BASE_DIR="$HOME/meus-plugins"
+PLUGINS_BASE_DIR="$BASE_DIR/meus-plugins"
 mkdir -p "$PLUGINS_BASE_DIR"
 
 echo "Executando o link dos plugins de acordo com a versão do Moodle..."
@@ -61,6 +61,7 @@ bin/moodle-docker-compose up -d
 echo "Setting up Moodle..."
 bin/moodle-docker-wait-for-db
 bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker Moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="admin@example.com"
+bin/moodle-docker-compose exec webserver php admin/cli/scheduled_task.php --execute='\core\task\h5p_get_content_types_task' || true
 
 echo "Moodle setup complete! Your site should be running."
 EOF

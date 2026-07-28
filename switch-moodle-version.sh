@@ -83,6 +83,9 @@ if [ "$RESET_DB" = true ]; then
     
     echo "Instalando o banco de dados do Moodle..."
     bin/moodle-docker-compose exec -T webserver php admin/cli/install_database.php --agree-license --fullname="Docker Moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="admin@example.com"
+    
+    echo "Instalando os tipos de conteúdo H5P padrão..."
+    bin/moodle-docker-compose exec -T webserver php admin/cli/scheduled_task.php --execute='\core\task\h5p_get_content_types_task' || true
 else
     echo "--> Tentando atualizar o banco de dados atual..."
     # Atualiza o banco; se falhar porque a versão é mais antiga, avisa o usuário
