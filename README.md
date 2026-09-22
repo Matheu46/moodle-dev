@@ -20,6 +20,10 @@ Para facilitar a aderência aos padrões de código do Moodle, este ambiente inc
     *   *Uso:* `./run-phpcs.sh local/meuplugin`
 *   **`run-phpcbf.sh <caminho>`**: Aplica correções automáticas (PHP Code Beautifier and Fixer) para erros de formatação encontrados pelo PHPCS.
     *   *Uso:* `./run-phpcbf.sh local/meuplugin`
+*   **`run-phpunit.sh [opções]`**: Facilita a execução de testes automatizados do PHPUnit no Moodle. Suporta inicialização automática do banco de testes.
+    *   *Uso:* `./run-phpunit.sh --init` (para inicializar a primeira vez)
+    *   *Uso:* `./run-phpunit.sh local/meuplugin` (para testar um plugin específico)
+    *   *Uso:* `./run-phpunit.sh --display-notices --display-deprecations local/meuplugin`
 *   **`run-grunt.sh [opções]`**: Sobe um micro-contêiner isolado com `Node 22` para compilar módulos AMD (Javascript) nativamente, injetando as pastas no contêiner para contornar limitações do Rollup com symlinks.
     *   *Uso:* `./run-grunt.sh amd --root=local/meuplugin`
 
@@ -35,10 +39,11 @@ Para facilitar a aderência aos padrões de código do Moodle, este ambiente inc
    ```bash
    ./run-grunt.sh amd --root=local/seu-plugin
    ```
-4. **Verifique a Qualidade do Código:**
+4. **Verifique a Qualidade do Código e Testes:**
    ```bash
-   ./run-phpcbf.sh local/seu-plugin # Corrige formatação automática
    ./run-phpcs.sh local/seu-plugin  # Exibe erros manuais a serem corrigidos
+   ./run-phpcbf.sh local/seu-plugin # Corrige formatação automática
+   ./run-phpunit.sh local/seu-plugin # Roda os testes unitários
    ```
 5. **Troque de Versão (Testes de Compatibilidade):**
    ```bash

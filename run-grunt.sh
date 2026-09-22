@@ -32,6 +32,11 @@ for plugin in $HOME/moodle-dev/meus-plugins/*; do
         plugin_name=$(basename "$plugin")
         plugin_type="${plugin_name%%_*}"
         plugin_subname="${plugin_name#*_}"
+
+        # Ignora plugins desativados para evitar que o Docker crie pastas vazias para eles
+        if [ -f "$plugin/.disabled" ] || [ -f "$plugin/.ignore" ]; then
+            continue
+        fi
         
         if [ "$plugin_type" != "$plugin_name" ]; then
             case "$plugin_type" in

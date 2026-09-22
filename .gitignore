@@ -1,6 +1,7 @@
 # Repositórios clonados (não vamos poluir o nosso repo principal)
 /moodle/
 /moodle-docker/
+/moodledata/
 
 # Scripts gerados dinamicamente e arquivos de ambiente local
 /start-moodle.sh

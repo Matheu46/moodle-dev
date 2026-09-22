@@ -45,8 +45,13 @@ cat << 'EOF' > "$START_SCRIPT"
 #!/bin/bash
 set -e
 
+if [ -f "$HOME/moodle-dev/.moodle-env" ]; then
+    source "$HOME/moodle-dev/.moodle-env"
+fi
+
 export MOODLE_DOCKER_WWWROOT="$HOME/moodle-dev/moodle"
 export MOODLE_DOCKER_DB=pgsql
+mkdir -p "$HOME/moodle-dev/moodledata/filedir" && chmod -R 777 "$HOME/moodle-dev/moodledata" 2>/dev/null || true
 
 cd "$HOME/moodle-dev/moodle-docker"
 
@@ -59,7 +64,9 @@ echo "Starting Moodle Docker containers..."
 bin/moodle-docker-compose up -d
 
 echo "Setting up Moodle..."
-bin/moodle-docker-wait-for-db
+until bin/moodle-docker-compose exec -T db pg_isready -U moodle > /dev/null 2>&1; do
+    sleep 1
+done
 bin/moodle-docker-compose exec webserver php admin/cli/install_database.php --agree-license --fullname="Docker Moodle" --shortname="docker_moodle" --adminpass="test" --adminemail="admin@example.com"
 bin/moodle-docker-compose exec webserver php admin/cli/scheduled_task.php --execute='\core\task\h5p_get_content_types_task' || true
 
