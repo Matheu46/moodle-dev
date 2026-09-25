@@ -2,6 +2,8 @@
 /moodle/
 /moodle-docker/
 /moodledata/
+/momopda/
+/db-backups/
 
 # Scripts gerados dinamicamente e arquivos de ambiente local
 /start-moodle.sh

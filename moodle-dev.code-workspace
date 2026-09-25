@@ -1,0 +1,158 @@
+{
+  "folders": [
+    {
+      "name": "🛠️ Ambiente (moodle-dev)",
+      "path": ".",
+      "settings": {
+        "files.exclude": {
+          "moodle": true,
+          "meus-plugins": true,
+          "momopda": true,
+          "moodledata": true
+        }
+      }
+    },
+    {
+      "name": "📝 local_quicknote",
+      "path": "meus-plugins/local_quicknote"
+    },
+    {
+      "name": "🎨 local_h5pthemer",
+      "path": "meus-plugins/local_h5pthemer"
+    },
+    {
+      "name": "💬 mod_dialoguebuilder",
+      "path": "meus-plugins/mod_dialoguebuilder"
+    },
+    {
+      "name": "🏛️ theme_union_govbr",
+      "path": "meus-plugins/theme_union_govbr"
+    },
+    {
+      "name": "📦 Todos os Plugins",
+      "path": "meus-plugins"
+    },
+    {
+      "name": "� Moodle Core (Referência)",
+      "path": "moodle"
+    },
+    {
+      "name": "📖 MoMoPDA (Diretrizes IA)",
+      "path": "momopda"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": false,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/vendor": true,
+      "**/moodledata": true,
+      "**/moodle-docker": true,
+      "**/db-backups": true
+    },
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/moodledata/**": true
+    },
+    "git.autorefresh": true,
+    "git.autoStash": true
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Iniciar Moodle (Docker)",
+        "type": "shell",
+        "command": "./start-moodle.sh",
+        "options": {
+          "cwd": "${workspaceFolder:🛠️ Ambiente (Scripts & Docker)}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "⚡ Compilar AMD / Grunt",
+        "type": "shell",
+        "command": "./run-grunt.sh amd",
+        "options": {
+          "cwd": "${workspaceFolder:🛠️ Ambiente (Scripts & Docker)}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "🔍 Validar Código PHP (PHPCS no arquivo atual)",
+        "type": "shell",
+        "command": "./run-phpcs.sh ${file}",
+        "options": {
+          "cwd": "${workspaceFolder:🛠️ Ambiente (Scripts & Docker)}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "group": "test"
+      },
+      {
+        "label": "✨ Auto-corrigir Código PHP (PHPCBF no arquivo atual)",
+        "type": "shell",
+        "command": "./run-phpcbf.sh ${file}",
+        "options": {
+          "cwd": "${workspaceFolder:🛠️ Ambiente (Scripts & Docker)}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "🧹 Limpar Caches do Moodle (Purge)",
+        "type": "shell",
+        "command": "cd moodle-docker && bin/moodle-docker-compose exec -T webserver php admin/cli/purge_caches.php",
+        "options": {
+          "cwd": "${workspaceFolder:🛠️ Ambiente (Scripts & Docker)}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      },
+      {
+        "label": "🔗 Atualizar Links Simbólicos (link-plugins)",
+        "type": "shell",
+        "command": "./link-plugins.sh",
+        "options": {
+          "cwd": "${workspaceFolder:🛠️ Ambiente (Scripts & Docker)}"
+        },
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        }
+      }
+    ]
+  }
+}
+
